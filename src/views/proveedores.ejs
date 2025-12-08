@@ -1,0 +1,60 @@
+<%- include('partials/_header') %>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-body">
+          <form action="/proveedores/add" method="post">
+            <div class="form-group my-2">
+              <input type="text" name="nombre" placeholder="Nombre del Proveedor" class="form-control" required>
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="contacto" placeholder="Contacto" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="direccion" placeholder="Dirección" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <input type="email" name="email" placeholder="Email" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success mt-3">Agregar Proveedor</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>N</th>
+            <th>Nombre</th>
+            <th>Contacto</th>
+            <th>Dirección</th>
+            <th>Email</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if(proveedores){ %>
+            <% for(let i = 0; i < proveedores.length; i++){ %>
+              <tr>
+                <td><%= (i+1) %></td>
+                <td><%= proveedores[i].nombre %></td>
+                <td><%= proveedores[i].contacto %></td>
+                <td><%= proveedores[i].direccion %></td>
+                <td><%= proveedores[i].email %></td>
+                <td>
+                  <a href="/proveedores/edit/<%= proveedores[i].id %>" class="btn btn-info">Editar</a>
+                  <a href="/proveedores/delete/<%= proveedores[i].id %>" class="btn btn-danger">Eliminar</a>
+                </td>
+              </tr>
+            <% } %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/_footer') %>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - POS</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>📊 POS</h2>
+            </div>
+
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-role" id="userRole">-</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/views/dashboard.html" class="nav-link">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/views/pos.html" class="nav-link">
+                    <span>🛒</span>
+                    <span>Punto de Venta</span>
+                </a>
+                <a href="/views/productos.html" class="nav-link">
+                    <span>📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="/views/inventario.html" class="nav-link">
+                    <span>📋</span>
+                    <span>Inventario</span>
+                </a>
+                <a href="/views/reportes.html" class="nav-link active">
+                    <span>📈</span>
+                    <span>Reportes</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary" style="width: 100%;" id="logoutBtn">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>📈 Reportes</h1>
+                <p>Analiza el rendimiento de tu negocio</p>
+            </div>
+
+            <!-- Filtros de fecha -->
+            <div class="card">
+                <div class="form-group" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                    <div>
+                        <label class="form-label">Fecha Inicio</label>
+                        <input type="date" id="fechaInicio" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Fecha Fin</label>
+                        <input type="date" id="fechaFin" class="form-input">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-primary" id="generarReporteBtn" style="width: 100%;">
+                            Generar Reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de ventas -->
+            <div class="stats-grid" style="margin-top: 2rem;">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Total Vendido</h3>
+                        <div class="stat-card-icon success">💰</div>
+                    </div>
+                    <div class="stat-card-value" id="totalVendido">S/ 0.00</div>
+                    <div class="stat-card-change" id="cantidadVentas">0 ventas</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Ticket Promedio</h3>
+                        <div class="stat-card-icon primary">📊</div>
+                    </div>
+                    <div class="stat-card-value" id="ticketPromedio">S/ 0.00</div>
+                    <div class="stat-card-change">Por venta</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Productos Vendidos</h3>
+                        <div class="stat-card-icon warning">📦</div>
+                    </div>
+                    <div class="stat-card-value" id="productosVendidos">0</div>
+                    <div class="stat-card-change">Unidades</div>
+                </div>
+            </div>
+
+            <!-- Productos más vendidos -->
+            <div class="card" style="margin-top: 2rem;">
+                <div class="card-header">
+                    <h3>📊 Top 10 Productos Más Vendidos</h3>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Cantidad Vendida</th>
+                                <th>Total Vendido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topProductosTable">
+                            <tr>
+                                <td colspan="4" class="loading">
+                                    <p>Selecciona un período para generar el reporte</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/reportes.js"></script>
+</body>
+
+</html>

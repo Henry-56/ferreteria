@@ -1,0 +1,95 @@
+<%- include('partials/_header') %>
+<div class="container mt-4">
+  <h2>Reporte de ventas</h2>
+  
+  <!-- Mensaje dinámico -->
+  <div id="mensaje-exito"></div>
+  
+  <form class="mb-3" method="post" action="/ventasReporte">
+    <div class="row align-items-end">
+      <div class="col-md-3">
+        <label>Desde</label>
+        <input type="date" name="desde" value="<%= desde || '' %>" class="form-control" required>
+      </div>
+      <div class="col-md-3">
+        <label>Hasta</label>
+        <input type="date" name="hasta" value="<%= hasta || '' %>" class="form-control" required>
+      </div>
+      <div class="col-md-3">
+        <label>Tipo filtro</label>
+        <select name="tipo" class="form-control">
+          <option value="dia" <%= tipo === 'dia' ? 'selected' : '' %>>Día</option>
+          <option value="semana" <%= tipo === 'semana' ? 'selected' : '' %>>Semana</option>
+          <option value="mes" <%= tipo === 'mes' ? 'selected' : '' %>>Mes</option>
+          <option value="anio" <%= tipo === 'anio' ? 'selected' : '' %>>Año</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+      </div>
+    </div>
+  </form>
+  
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Fecha</th>
+        <th>Usuario/Cajero</th>
+        <th>Total (S/)</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (ventas && ventas.length > 0) { %>
+        <% ventas.forEach(function(v, i){ %>
+          <tr>
+            <td><%= i+1 %></td>
+            <td><%= v.fecha.toISOString().slice(0,10) %></td>
+            <td><%= v.usuario %></td>
+            <td>S/<%= v.total %></td>
+            <td>
+              <a href="/ventas/edit/<%= v.id %>" class="btn btn-warning btn-sm">Editar</a>
+              <form class="form-eliminar" action="/ventas/delete/<%= v.id %>" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm"
+                  onclick="return confirm('¿Seguro que quieres eliminar esta venta?');">
+                  Eliminar
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      <% } else { %>
+        <tr><td colspan="5">Sin resultados en este rango.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+  
+  <div class="d-flex flex-row-reverse mb-3">
+    <h5>
+      Total ventas: S/ <%= ventas && ventas.length > 0
+        ? ventas.reduce((acc,v) => acc + Number(v.total || 0), 0).toFixed(2)
+        : "0.00" %>
+    </h5>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.form-eliminar').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const divMensaje = document.getElementById('mensaje-exito');
+      divMensaje.innerHTML = `
+        <div class='alert alert-success alert-dismissible fade show' role='alert'>
+          Venta eliminada
+          <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Cerrar'></button>
+        </div>
+      `;
+      // ¡NO uses e.preventDefault()!
+      // El formulario se enviará normalmente y eliminará la venta en el backend.
+      // El mensaje solo será visible por un instante.
+    });
+  });
+</script>
+
+
+<%- include('partials/_footer') %>

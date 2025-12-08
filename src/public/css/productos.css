@@ -1,0 +1,67 @@
+/* Estilos de Productos */
+.productos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.productos-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.productos-table-container {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.productos-filters {
+    background: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: var(--space-4);
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.table-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.table-actions .btn {
+    padding: var(--space-2) var(--space-3);
+}
+
+.producto-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+.form-full-width {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+    .producto-form {
+        grid-template-columns: 1fr;
+    }
+
+    .productos-filters {
+        flex-direction: column;
+    }
+}

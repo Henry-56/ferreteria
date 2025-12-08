@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos - POS</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/productos.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>📊 POS</h2>
+            </div>
+
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-role" id="userRole">-</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/views/dashboard.html" class="nav-link">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/views/pos.html" class="nav-link">
+                    <span>🛒</span>
+                    <span>Punto de Venta</span>
+                </a>
+                <a href="/views/productos.html" class="nav-link active">
+                    <span>📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="/views/inventario.html" class="nav-link">
+                    <span>📋</span>
+                    <span>Inventario</span>
+                </a>
+                <a href="/views/reportes.html" class="nav-link">
+                    <span>📈</span>
+                    <span>Reportes</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary" style="width: 100%;" id="logoutBtn">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <div class="productos-header">
+                <div>
+                    <h1>📦 Productos</h1>
+                    <p>Gestiona tu catálogo de productos</p>
+                </div>
+                <div class="productos-actions">
+                    <button class="btn btn-primary" id="nuevoProductoBtn">
+                        ➕ Nuevo Producto
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="productos-filters">
+                <div class="filter-group">
+                    <input type="text" id="searchProducto" class="form-input" placeholder="🔍 Buscar producto...">
+                </div>
+                <div class="filter-group">
+                    <select id="filterStatus" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="1" selected>Activos</option>
+                        <option value="0">Inactivos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button class="btn btn-secondary" id="clearFiltersBtn">
+                        Limpiar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla de productos -->
+            <div class="productos-table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Código de Barras</th>
+                            <th>Precio Venta</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productosTable">
+                        <tr>
+                            <td colspan="6" class="loading">
+                                <div class="spinner"></div>
+                                <p>Cargando productos...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="pagination" id="pagination"></div>
+        </main>
+    </div>
+
+    <!-- Modal de Producto -->
+    <div class="modal-overlay" id="productoModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <h3 id="modalTitle">Nuevo Producto</h3>
+
+            <form id="productoForm" class="producto-form">
+                <div class="form-group">
+                    <label class="form-label">Nombre *</label>
+                    <input type="text" id="nombre" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Rubro (Categoría) *</label>
+                    <select id="id_rubro" class="form-select" required>
+                        <option value="">Seleccione un rubro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Proveedor</label>
+                    <select id="proveedor_id" class="form-select">
+                        <option value="">Sin proveedor</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Código de Barras</label>
+                    <input type="text" id="codigo_barra" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Precio de Compra</label>
+                    <input type="number" id="precio_compra" class="form-input" step="0.01" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Precio de Venta *</label>
+                    <input type="number" id="precio_venta" class="form-input" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Stock Inicial *</label>
+                    <input type="number" id="stock" class="form-input" value="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Stock Mínimo</label>
+                    <input type="number" id="stock_minimo" class="form-input" value="5">
+                </div>
+
+                <div class="form-group form-full-width">
+                    <label class="form-label">Imagen del Producto</label>
+                    <div class="image-upload-container">
+                        <div class="image-preview" id="imagePreview">
+                            <img id="previewImg" src="" alt="Preview"
+                                style="display: none; max-width: 200px; max-height: 200px; object-fit: contain;">
+                            <div class="upload-placeholder" id="uploadPlaceholder">
+                                <span style="font-size: 3em;">📷</span>
+                                <p>Click para seleccionar imagen</p>
+                            </div>
+                        </div>
+                        <input type="file" id="imagenInput" accept="image/*" style="display: none;">
+                        <input type="hidden" id="imagen_url" value="">
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button type="button" class="btn btn-secondary btn-sm" id="selectImageBtn">
+                                📁 Seleccionar Imagen
+                            </button>
+                            <button type="button" class="btn btn-error btn-sm" id="removeImageBtn"
+                                style="display: none;">
+                                ❌ Eliminar Imagen
+                            </button>
+                        </div>
+                        <small style="color: var(--gray-600); margin-top: 5px; display: block;">Tamaño máximo: 5MB.
+                            Formatos: JPG, PNG, WEBP</small>
+                    </div>
+                </div>
+
+                <div class="form-group form-full-width">
+                    <label class="form-label">Descripción</label>
+                    <textarea id="descripcion" class="form-textarea" rows="3"></textarea>
+                </div>
+            </form>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelarBtn">Cancelar</button>
+                <button class="btn btn-primary" id="guardarBtn">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/productos.js"></script>
+</body>
+
+</html>

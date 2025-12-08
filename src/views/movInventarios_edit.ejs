@@ -1,0 +1,50 @@
+<%- include('partials/_header') %>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-body">
+          <form action="/movInventario/update/<%= movimiento.id %>" method="post">
+            <div class="form-group my-2">
+              <label for="producto_id">Producto:</label>
+              <select name="producto_id" class="form-control" required>
+                <% if(productos && productos.length > 0){ %>
+                  <% for(let producto of productos){ %>
+                    <option value="<%= producto.id %>" <%= movimiento.producto_id == producto.id ? 'selected' : '' %>><%= producto.nombre %></option>
+                  <% } %>
+                <% } else { %>
+                  <option>Sin productos</option>
+                <% } %>
+              </select>
+            </div>
+            <div class="form-group my-2">
+              <select name="tipo_movimiento" class="form-control" required>
+                <option value="compra" <%= movimiento.tipo_movimiento === 'compra' ? 'selected' : '' %>>Compra</option>
+                <option value="venta" <%= movimiento.tipo_movimiento === 'venta' ? 'selected' : '' %>>Venta</option>
+                <option value="ajuste" <%= movimiento.tipo_movimiento === 'ajuste' ? 'selected' : '' %>>Ajuste</option>
+                <option value="merma" <%= movimiento.tipo_movimiento === 'merma' ? 'selected' : '' %>>Merma</option>
+                <option value="robo" <%= movimiento.tipo_movimiento === 'robo' ? 'selected' : '' %>>Robo</option>
+              </select>
+            </div>
+            <div class="form-group my-2">
+              <input type="number" step="1" name="cantidad" value="<%= movimiento.cantidad %>" class="form-control" required>
+            </div>
+            <div class="form-group my-2">
+              <input type="date" name="fecha" value="<%= movimiento.fecha.toISOString().slice(0,10) %>" class="form-control" required>
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="motivo" value="<%= movimiento.motivo %>" class="form-control" placeholder="Motivo">
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="referencia" value="<%= movimiento.referencia %>" class="form-control" placeholder="Referencia">
+            </div>
+            <button type="submit" class="btn btn-success mt-3">Editar Movimiento</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/_footer') %>

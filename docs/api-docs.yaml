@@ -1,0 +1,309 @@
+openapi: 3.0.0
+info:
+  title: API Multiservicios
+  description: Backend para gestión de inventario, ventas y productos de tienda multiservicios.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desarrollo
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Producto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Coca Cola 3L"
+        descripcion:
+          type: string
+          example: "Bebida gaseosa familiar"
+        id_rubro:
+          type: integer
+          example: 1
+        precio_venta:
+          type: number
+          format: float
+          example: 12.50
+        stock:
+          type: integer
+          example: 50
+        stock_minimo:
+          type: integer
+          example: 5
+        codigo_barra:
+          type: string
+          example: "770123456789"
+        sku:
+          type: string
+          example: "BEB-001"
+        imagen_url:
+          type: string
+          nullable: true
+          example: "https://storage.googleapis.com/emagenes/productos/producto_123.jpg"
+        status:
+          type: integer
+          description: "1: Activo, 0: Inactivo/Eliminado"
+          example: 1
+    ProductoInput:
+      type: object
+      required:
+        - nombre
+        - id_rubro
+        - precio_venta
+      properties:
+        nombre:
+          type: string
+        id_rubro:
+          type: integer
+        precio_venta:
+          type: number
+        stock:
+          type: integer
+        stock_minimo:
+          type: integer
+        codigo_barra:
+          type: string
+        sku:
+          type: string
+        descripcion:
+          type: string
+    AjusteStockInput:
+      type: object
+      required:
+        - nuevoStock
+      properties:
+        nuevoStock:
+          type: integer
+        motivo:
+          type: string
+security:
+  - bearerAuth: []
+paths:
+  /api/productos:
+    get:
+      summary: Listar productos
+      description: Obtiene una lista paginada de productos con filtros opcionales.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Número de página
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          description: Productos por página
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Buscar por nombre, código de barra o SKU
+        - in: query
+          name: id_rubro
+          schema:
+            type: integer
+          description: Filtrar por ID de rubro
+        - in: query
+          name: bajo_stock
+          schema:
+            type: boolean
+          description: Si es true, devuelve solo productos con stock bajo
+      responses:
+        '200':
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Producto'
+                  pagination:
+                    type: object
+                    properties:
+                      total: 
+                        type: integer
+                      page:
+                        type: integer
+                      pages: 
+                        type: integer
+    post:
+      summary: Crear producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoInput'
+      responses:
+        '201':
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Producto'
+
+  /api/productos/{id}:
+    get:
+      summary: Obtener producto por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalle del producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Producto'
+        '404':
+          description: Producto no encontrado
+    put:
+      summary: Actualizar producto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoInput'
+      responses:
+        '200':
+          description: Producto actualizado
+    delete:
+      summary: Eliminar producto (Soft Delete)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Producto eliminado correctamente
+
+  /api/productos/barcode/{codigo}:
+    get:
+      summary: Buscar por código de barras
+      parameters:
+        - in: path
+          name: codigo
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Producto'
+        '404':
+          description: Producto no encontrado
+
+  /api/productos/{id}/ajustar-stock:
+    post:
+      summary: Ajustar stock manualmente
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AjusteStockInput'
+      responses:
+        '200':
+          description: Stock ajustado
+
+  /api/productos/{id}/imagen:
+    post:
+      summary: Subir imagen de producto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                imagen:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Imagen subida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      imagen_url:
+                        type: string
+    delete:
+      summary: Eliminar imagen de producto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Imagen eliminada

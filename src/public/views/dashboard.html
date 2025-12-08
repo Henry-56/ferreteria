@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - POS Multiservicios</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>📊 POS</h2>
+            </div>
+
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-role" id="userRole">-</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/views/dashboard.html" class="nav-link active">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/views/pos.html" class="nav-link">
+                    <span>🛒</span>
+                    <span>Punto de Venta</span>
+                </a>
+                <a href="/views/productos.html" class="nav-link">
+                    <span>📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="/views/inventario.html" class="nav-link">
+                    <span>📋</span>
+                    <span>Inventario</span>
+                </a>
+                <a href="/views/reportes.html" class="nav-link">
+                    <span>📈</span>
+                    <span>Reportes</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary" style="width: 100%;" id="logoutBtn">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p>Resumen de tu negocio</p>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Ventas Hoy</h3>
+                        <div class="stat-card-icon success">💰</div>
+                    </div>
+                    <div class="stat-card-value" id="ventasHoy">S/ 0.00</div>
+                    <div class="stat-card-change">Cargando...</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Total Productos</h3>
+                        <div class="stat-card-icon primary">📦</div>
+                    </div>
+                    <div class="stat-card-value" id="totalProductos">0</div>
+                    <div class="stat-card-change">En inventario</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Stock Bajo</h3>
+                        <div class="stat-card-icon warning">⚠️</div>
+                    </div>
+                    <div class="stat-card-value" id="stockBajo">0</div>
+                    <div class="stat-card-change">Productos</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Productos Agotados</h3>
+                        <div class="stat-card-icon error">🚫</div>
+                    </div>
+                    <div class="stat-card-value" id="productosAgotados">0</div>
+                    <div class="stat-card-change">Sin stock</div>
+                </div>
+            </div>
+
+            <!-- Acciones rápidas -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Acciones Rápidas</h3>
+                </div>
+                <div class="flex gap-4">
+                    <a href="/views/pos.html" class="btn btn-primary">
+                        🛒 Nueva Venta
+                    </a>
+                    <a href="/views/productos.html?action=create" class="btn btn-secondary">
+                        ➕ Agregar Producto
+                    </a>
+                    <a href="/views/reportes.html" class="btn btn-secondary">
+                        📊 Ver Reportes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Productos con stock bajo -->
+            <div class="card mt-4" id="stockBajoSection" style="display: none; margin-top: 2rem;">
+                <div class="card-header">
+                    <h3>⚠️ Productos con Stock Bajo</h3>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Stock Actual</th>
+                                <th>Stock Mínimo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockBajoTable">
+                            <!-- Se llena con JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+
+</html>

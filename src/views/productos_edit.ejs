@@ -1,0 +1,89 @@
+<%- include('partials/_header') %>
+
+<div class="container mt-5" >
+  <div class="row">
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-body">
+          <form action="/productos/update/<%= producto.id %>" method="post">
+            <div class="form-group my-2">
+              <input type="text" name="nombre" value="<%= producto.nombre %>" class="form-control" required>
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="descripcion" value="<%= producto.descripcion %>" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <input type="number" step="0.01" name="precio_compra" value="<%= producto.precio_compra %>" class="form-control" placeholder="Precio Compra">
+            </div>
+            <div class="form-group my-2">
+              <input type="number" step="0.01" name="precio_venta" value="<%= producto.precio_venta %>" class="form-control" placeholder="Precio Venta">
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="marca" value="<%= producto.marca %>" class="form-control" placeholder="Marca">
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="talla" value="<%= producto.talla %>" class="form-control" placeholder="Talla">
+            </div>
+            <div class="form-group my-2">
+              <label>Color:</label>
+              <select name="color" class="form-control">
+                <option value="rojo" <%= producto.color === 'rojo' ? 'selected' : '' %>>Rojo</option>
+                <option value="azul" <%= producto.color === 'azul' ? 'selected' : '' %>>Azul</option>
+                <option value="verde" <%= producto.color === 'verde' ? 'selected' : '' %>>Verde</option>
+                <option value="amarillo" <%= producto.color === 'amarillo' ? 'selected' : '' %>>Amarillo</option>
+                <option value="blanco" <%= producto.color === 'blanco' ? 'selected' : '' %>>Blanco</option>
+                <option value="negro" <%= producto.color === 'negro' ? 'selected' : '' %>>Negro</option>
+              </select>
+            </div>
+            <div class="form-group my-2">
+              <label for="unidad">Unidad de Medida:</label>
+              <select name="unidad" class="form-control">
+                <option value="pieza" <%= producto.unidad === 'pieza' ? 'selected' : '' %>>Pieza</option>
+                <option value="metro" <%= producto.unidad === 'metro' ? 'selected' : '' %>>Metro</option>
+                <option value="kilo" <%= producto.unidad === 'kilo' ? 'selected' : '' %>>Kilo</option>
+                <option value="litro" <%= producto.unidad === 'litro' ? 'selected' : '' %>>Litro</option>
+                <option value="unidad" <%= producto.unidad === 'unidad' ? 'selected' : '' %>>Unidad</option>
+              </select>
+            </div>
+            <div class="form-group my-2">
+              <input type="number" name="stock" value="<%= producto.stock %>" class="form-control" placeholder="Stock">
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="codigo_barra" value="<%= producto.codigo_barra %>" class="form-control" placeholder="Código de barra">
+            </div>
+            <div class="form-group my-2">
+              <label for="id_rubro">Categoría / Rubro:</label>
+              <select name="id_rubro" class="form-control" required>
+                <% if(rubros && rubros.length > 0){ %>
+                  <% for(let rubro of rubros){ %>
+                    <option value="<%= rubro.id %>" <%= producto.id_rubro == rubro.id ? 'selected' : '' %>><%= rubro.nombre %></option>
+                  <% } %>
+                <% } else { %>
+                  <option>Sin categorías</option>
+                <% } %>
+              </select>
+            </div>
+            <div class="form-group my-2">
+              <label for="proveedor_id">Proveedor:</label>
+              <select name="proveedor_id" class="form-control">
+                <% if(proveedores && proveedores.length > 0){ %>
+                  <% for(let proveedor of proveedores){ %>
+                    <option value="<%= proveedor.id %>" <%= producto.proveedor_id == proveedor.id ? 'selected' : '' %>><%= proveedor.nombre %></option>
+                  <% } %>
+                <% } else { %>
+                  <option>Sin proveedores</option>
+                <% } %>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-success mt-3">
+              Editar Producto
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/_footer') %>
+

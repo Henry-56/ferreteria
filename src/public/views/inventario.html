@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario - POS</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/inventario.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>📊 POS</h2>
+            </div>
+
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-role" id="userRole">-</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/views/dashboard.html" class="nav-link">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/views/pos.html" class="nav-link">
+                    <span>🛒</span>
+                    <span>Punto de Venta</span>
+                </a>
+                <a href="/views/productos.html" class="nav-link">
+                    <span>📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="/views/inventario.html" class="nav-link active">
+                    <span>📋</span>
+                    <span>Inventario</span>
+                </a>
+                <a href="/views/reportes.html" class="nav-link">
+                    <span>📈</span>
+                    <span>Reportes</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary" style="width: 100%;" id="logoutBtn">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>📋 Control de Inventario</h1>
+                <p>Gestiona el stock y movimientos de tus productos</p>
+            </div>
+
+            <!-- KPIs de Inventario -->
+            <div class="inventory-stats">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Valor del Inventario</h3>
+                        <div class="stat-card-icon primary">💰</div>
+                    </div>
+                    <div class="stat-card-value" id="totalValor">S/ 0.00</div>
+                    <div class="stat-card-change">Costo total</div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Stock Bajo</h3>
+                        <div class="stat-card-icon warning">⚠️</div>
+                    </div>
+                    <div class="stat-card-value" id="totalBajoStock">0</div>
+                    <div class="stat-card-change">Productos</div>
+                </div>
+
+                <div class="stat-card alert">
+                    <div class="stat-card-header">
+                        <h3 class="stat-card-title">Agotados</h3>
+                        <div class="stat-card-icon error">🚫</div>
+                    </div>
+                    <div class="stat-card-value" id="totalAgotados">0</div>
+                    <div class="stat-card-change">Productos</div>
+                </div>
+            </div>
+
+            <!-- Acciones y Filtros -->
+            <div class="card">
+                <div class="inventory-actions">
+                    <div style="flex: 1;">
+                        <input type="text" id="searchInventory" class="form-input" placeholder="🔍 Buscar producto...">
+                    </div>
+                    <select id="filterStock" class="form-select" style="width: 200px;">
+                        <option value="all">Todos los productos</option>
+                        <option value="low">Stock Bajo</option>
+                        <option value="out">Agotados</option>
+                    </select>
+                    <button class="btn btn-primary" id="ajusteRapidoBtn">
+                        ⚡ Ajuste Rápido
+                    </button>
+                </div>
+
+                <!-- Tabla de Inventario -->
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Código</th>
+                                <th>Stock Actual</th>
+                                <th>Stock Mínimo</th>
+                                <th>Valor Total</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTable">
+                            <tr>
+                                <td colspan="7" class="loading">Cargando inventario...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Ajuste de Stock -->
+    <div class="modal-overlay" id="ajusteModal">
+        <div class="modal-content">
+            <h3>Ajuste de Stock</h3>
+            <p id="ajusteProductoNombre" style="margin-bottom: 1rem; color: var(--gray-600);"></p>
+
+            <form id="ajusteForm">
+                <input type="hidden" id="ajusteProductoId">
+
+                <div class="form-group">
+                    <label class="form-label">Tipo de Movimiento</label>
+                    <div class="movement-type-selector">
+                        <label class="radio-label">
+                            <input type="radio" name="tipo_movimiento" value="entrada" checked>
+                            <span>📥 Entrada</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="tipo_movimiento" value="salida">
+                            <span>📤 Salida</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="tipo_movimiento" value="ajuste">
+                            <span>🔧 Ajuste</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <input type="number" id="ajusteCantidad" class="form-input" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Motivo / Nota</label>
+                    <textarea id="ajusteNota" class="form-textarea" rows="2"
+                        placeholder="Razón del ajuste..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelarAjusteBtn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Movimiento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/inventario.js"></script>
+</body>
+
+</html>

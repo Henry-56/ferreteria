@@ -1,0 +1,144 @@
+<%- include('partials/_header') %>
+<div class="container mt-4">
+  <h2>Registrar nueva compra</h2>
+  <form id="formCompra">
+    <div class="row">
+      <div class="col-md-4">
+        <label>Fecha:</label>
+        <input type="date" name="fecha" class="form-control" required value="<%= fechaActual %>">
+      </div>
+      <div class="col-md-4">
+        <label>Proveedor:</label>
+        <select name="proveedor_id" class="form-control" required>
+          <% proveedores.forEach(p => { %>
+            <option value="<%= p.id %>"><%= p.nombre %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <button type="button" id="addDetalleRow" class="btn btn-primary mt-4 w-100">Agregar producto</button>
+      </div>
+    </div>
+    <hr>
+    <h4>Productos comprados</h4>
+    <table class="table table-bordered" id="tablaDetalle">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Precio unitario</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Filas dinámicas aquí -->
+      </tbody>
+    </table>
+    <div class="d-flex flex-row-reverse">
+      <strong>Total S/ <span id="totalCompra">0.00</span></strong>
+    </div>
+    <button type="submit" class="btn btn-success mt-3 w-100">Guardar compra</button>
+  </form>
+</div>
+<script>
+  // --- Tus productos deben venir del backend (p.ej.: let productos = [{id:1,nombre:'Arroz'}, ...])
+  const productos = <%- JSON.stringify(productos) %>;
+
+  // Crear y agregar una fila en la tabla de detalle
+  function crearRowDetalle() {
+    const tr = document.createElement('tr');
+    let opciones = '';
+    productos.forEach(p => {
+      opciones += `<option value="${p.id}">${p.nombre}</option>`;
+    });
+    tr.innerHTML = `
+      <td>
+        <select class="form-control productoSelect" required>
+          <option value="">Selecciona producto</option>
+          ${opciones}
+        </select>
+      </td>
+      <td>
+        <input type="number" class="form-control cantidadInput" min="1" required value="1">
+      </td>
+      <td>
+        <input type="number" class="form-control precioInput" step="0.01" min="0.01" required>
+      </td>
+      <td class="subtotalCell">0.00</td>
+      <td>
+        <button type="button" class="btn btn-danger btn-sm quitarRow">Quitar</button>
+      </td>
+    `;
+    document.querySelector('#tablaDetalle tbody').appendChild(tr);
+  }
+
+  // Agrega nueva fila al hacer click
+  document.getElementById('addDetalleRow').addEventListener('click', crearRowDetalle);
+
+  // Quitar fila
+  document.querySelector('#tablaDetalle').addEventListener('click', function(e) {
+    if (e.target.classList.contains('quitarRow')) {
+      e.target.closest('tr').remove(); 
+      calcularSubtotalesYTotal();
+    }
+  });
+
+  // Calcular subtotales y total cuando se modifica cantidad/precio
+  document.querySelector('#tablaDetalle').addEventListener('input', function(e) {
+    if (e.target.classList.contains('cantidadInput') || e.target.classList.contains('precioInput')) {
+      calcularSubtotalesYTotal();
+    }
+  });
+
+  function calcularSubtotalesYTotal() {
+    let total = 0;
+    document.querySelectorAll('#tablaDetalle tbody tr').forEach(tr => {
+      const cantidad = Number(tr.querySelector('.cantidadInput').value) || 0;
+      const precio = Number(tr.querySelector('.precioInput').value) || 0;
+      const subtotal = cantidad * precio;
+      tr.querySelector('.subtotalCell').textContent = subtotal.toFixed(2);
+      total += subtotal;
+    });
+    document.getElementById('totalCompra').textContent = total.toFixed(2);
+  }
+
+  // --- ENVÍO JSON IDEAL ---
+  const form = document.getElementById('formCompra');
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    // Armar detalle en JSON
+    const detalle = [];
+    document.querySelectorAll('#tablaDetalle tbody tr').forEach(tr => {
+      const producto_id = Number(tr.querySelector('.productoSelect').value);
+      const cantidad = Number(tr.querySelector('.cantidadInput').value);
+      const precio_unit = Number(tr.querySelector('.precioInput').value);
+      if (!producto_id || !cantidad || !precio_unit) return;
+      detalle.push({ producto_id, cantidad, precio_unit });
+    });
+    if (detalle.length === 0) {
+      alert("Agrega al menos un producto a la compra.");
+      return;
+    }
+    const data = {
+      fecha: form.fecha.value,
+      proveedor_id: Number(form.proveedor_id.value),
+      total: Number(document.getElementById('totalCompra').textContent),
+      detalle: detalle
+    };
+    fetch('/compras/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(async resp => {
+      if (resp.ok) {
+        alert('Compra registrada');
+        location.reload();
+      } else {
+        const text = await resp.text();
+        alert('Error: ' + text);
+      }
+    }).catch(err => alert('Error de red: ' + err));
+  });
+</script>
+<%- include('partials/_footer') %>

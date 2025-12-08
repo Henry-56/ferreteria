@@ -1,0 +1,120 @@
+<%- include('partials/_header') %>
+
+<div class="container mt-4">
+  <h2>Registrar nueva venta</h2>
+  <form id="formVenta" action="/ventas/add" method="post">
+    <div class="row">
+      <div class="col-md-4">
+        <label>Fecha:</label>
+        <input type="date" name="fecha" class="form-control" required value="<%= fechaActual %>">
+      </div>
+      <div class="col-md-4">
+        <label>Usuario/Cajero:</label>
+        <input type="text" name="usuario" class="form-control" required>
+      </div>
+      <div class="col-md-4">
+        <button type="button" id="addDetalleRow" class="btn btn-primary mt-4 w-100">Agregar producto</button>
+      </div>
+    </div>
+    <hr>
+    <h4>Productos vendidos</h4>
+    <table class="table table-bordered" id="tablaDetalle">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Cantidad</th>
+          <th>Precio unitario</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Aquí van los rows generados -->
+      </tbody>
+    </table>
+    <div class="d-flex flex-row-reverse">
+      <strong>Total S/ <span id="totalVenta">0.00</span></strong>
+    </div>
+    <button type="submit" class="btn btn-success mt-3 w-100">Guardar venta</button>
+  </form>
+</div>
+
+<script>
+  // Datos de productos enviados desde el backend
+  const productos = <%- JSON.stringify(productos) %>;
+  function crearRowDetalle() {
+    const tr = document.createElement('tr');
+    // Producto select
+    let opciones = '';
+    productos.forEach(p => {
+      opciones += `<option value="${p.id}" data-categoria="${p.rubro_nombre}" data-precio="${p.precio_venta}">${p.nombre}</option>`;
+    });
+    tr.innerHTML = `
+      <td>
+        <select name="detalle[producto_id][]" class="form-control productoSelect" required>
+          <option value="">Selecciona producto</option>
+          ${opciones}
+        </select>
+      </td>
+      <td class="categoriaCell"></td>
+      <td>
+        <input type="number" name="detalle[cantidad][]" class="form-control cantidadInput" min="1" required value="1">
+      </td>
+      <td>
+        <input type="number" name="detalle[precio_unit][]" class="form-control precioInput" step="0.01" min="0" required>
+      </td>
+      <td class="subtotalCell">0.00</td>
+      <td>
+        <button type="button" class="btn btn-danger btn-sm quitarRow">Quitar</button>
+      </td>
+    `;
+    document.querySelector('#tablaDetalle tbody').appendChild(tr);
+  }
+
+  document.getElementById('addDetalleRow').addEventListener('click', crearRowDetalle);
+
+  // Actualiza categoría y precio automáticamente al seleccionar producto
+  document.querySelector('#tablaDetalle').addEventListener('change', function(e) {
+    if (e.target.classList.contains('productoSelect')) {
+      const option = e.target.selectedOptions[0];
+      const categoria = option.dataset.categoria || '';
+      const precio = option.dataset.precio || '';
+      const row = e.target.closest('tr');
+      row.querySelector('.categoriaCell').textContent = categoria;
+      const precioInput = row.querySelector('.precioInput');
+      precioInput.value = precio;
+
+    }
+    calcularSubtotalesYTotal();
+  });
+
+  // Quitar fila de detalle
+  document.querySelector('#tablaDetalle').addEventListener('click', function(e) {
+    if (e.target.classList.contains('quitarRow')) {
+      e.target.closest('tr').remove();
+      calcularSubtotalesYTotal();
+    }
+  });
+
+  // Recalcular subtotales/cantidades/precios
+  document.querySelector('#tablaDetalle').addEventListener('input', function(e) {
+    if (e.target.classList.contains('cantidadInput') || e.target.classList.contains('precioInput')) {
+      calcularSubtotalesYTotal();
+    }
+  });
+
+  function calcularSubtotalesYTotal() {
+    let total = 0;
+    document.querySelectorAll('#tablaDetalle tbody tr').forEach(tr => {
+      const cantidad = Number(tr.querySelector('.cantidadInput').value) || 0;
+      const precio = Number(tr.querySelector('.precioInput').value) || 0;
+      const subtotal = cantidad * precio;
+      tr.querySelector('.subtotalCell').textContent = subtotal.toFixed(2);
+      total += subtotal;
+    });
+    document.getElementById('totalVenta').textContent = total.toFixed(2);
+  }
+</script>
+
+<%- include('partials/_footer') %>

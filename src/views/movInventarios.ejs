@@ -1,0 +1,106 @@
+<%- include('partials/_header') %>
+<div class="container mt-4">
+  <h3>Inventario actual</h3>
+  <table class="table table-striped table-bordered" id="tablaInventario">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Código</th>
+        <th>Producto</th>
+        <th>Categoría</th>
+        <th>Stock</th>
+        <th>Unidad</th>
+        <th>Precio venta</th>
+        <th>Marca</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if(productos && productos.length > 0){ %>
+        <% productos.forEach((prod, i) => { %>
+          <tr>
+            <td><%= i+1 %></td>
+            <td><%= prod.codigo || prod.id %></td>
+            <td><%= prod.nombre %></td>
+            <td><%= prod.rubro ? prod.rubro.dataValues.nombre : '-' %></td>
+            <td><%= prod.stock %></td>
+            <td><%= prod.unidad || '' %></td>
+            <td>S/ <%= prod.precio_venta || '-' %></td>
+            <td><%= prod.marca || '-' %></td>
+            <td>
+              <button class="btn btn-info btn-sm verMovimientosBtn" 
+                      data-producto-id="<%= prod.id %>"
+                      data-producto-nombre="<%= prod.nombre %>">
+                Movimientos
+              </button>
+            </td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr>
+          <td colspan="9" class="text-center">No hay productos en inventario.</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal Movimientos -->
+<div class="modal fade" id="movimientosModal" tabindex="-1" aria-labelledby="movimientosModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="movimientosModalLabel">Movimientos de <span id="modalProductoNombre"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Tipo</th>
+              <th>Cantidad</th>
+              <th>Fecha</th>
+              <th>Motivo</th>
+              <th>Referencia</th>
+            </tr>
+          </thead>
+          <tbody id="tablaMovimientos">
+            <!-- Filas dinámicas JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const movimientos = <%- JSON.stringify(movimientos.map(mv => mv.dataValues || mv)) %>;
+  document.querySelectorAll('.verMovimientosBtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const prodId = Number(this.dataset.productoId);
+      const prodName = this.dataset.productoNombre;
+      document.getElementById('modalProductoNombre').textContent = prodName;
+      // Filtrar movimientos del producto
+      const movs = movimientos.filter(mv => mv.producto_id === prodId);
+      const tbody = document.getElementById('tablaMovimientos');
+      tbody.innerHTML = movs.length > 0 ? movs.map((mv, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${mv.tipo_movimiento}</td>
+          <td>${mv.cantidad}</td>
+          <td>${new Date(mv.fecha).toISOString().slice(0,10)}</td>
+          <td>${mv.motivo || '-'}</td>
+          <td>${mv.referencia || '-'}</td>
+        </tr>
+      `).join('') : `<tr><td colspan="6" class="text-center">Sin movimientos</td></tr>`;
+      // Abrir modal Bootstrap 5
+      const modal = new bootstrap.Modal(document.getElementById('movimientosModal'));
+      modal.show();
+    });
+  });
+});
+</script>
+<%- include('partials/_footer') %>

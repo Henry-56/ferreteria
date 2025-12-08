@@ -1,0 +1,83 @@
+<%- include('partials/_header') %>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-body">
+          <form action="/detalleVenta/add" method="post">
+            <div class="form-group my-2">
+              <label for="venta_id">Venta:</label>
+              <select name="venta_id" class="form-control" required>
+                <% if(ventas && ventas.length > 0){ %>
+                  <% for(let venta of ventas){ %>
+                    <option value="<%= venta.id %>">Venta <%= venta.id %> - <%= venta.fecha.toISOString().slice(0,10) %></option>
+                  <% } %>
+                <% } else { %>
+                  <option>Sin ventas</option>
+                <% } %>
+              </select>
+            </div>
+            <div class="form-group my-2">
+              <label for="producto_id">Producto:</label>
+              <select name="producto_id" class="form-control" required>
+                <% if(productos && productos.length > 0){ %>
+                  <% for(let producto of productos){ %>
+                    <option value="<%= producto.id %>"><%= producto.nombre %></option>
+                  <% } %>
+                <% } else { %>
+                  <option>Sin productos</option>
+                <% } %>
+              </select>
+            </div>
+            <div class="form-group my-2">
+              <input type="number" step="1" name="cantidad" placeholder="Cantidad" class="form-control" required>
+            </div>
+            <div class="form-group my-2">
+              <input type="number" step="0.01" name="precio_unit" placeholder="Precio Unitario" class="form-control" required>
+            </div>
+            <div class="form-group my-2">
+              <input type="number" step="0.01" name="subtotal" placeholder="Subtotal" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-success mt-3">Agregar Detalle</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>N</th>
+            <th>Venta</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Subtotal</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if(detalles){ %>
+            <% for(let i = 0; i < detalles.length; i++){ %>
+              <tr>
+                <td><%= (i+1) %></td>
+                <td><%= detalles[i].venta_id %></td>
+                <td><%= detalles[i].nombre_producto || detalles[i].producto_id %></td>
+                <td><%= detalles[i].cantidad %></td>
+                <td>S/<%= detalles[i].precio_unit %></td>
+                <td>S/<%= detalles[i].subtotal %></td>
+                <td>
+                  <a href="/detalleVenta/edit/<%= detalles[i].id %>" class="btn btn-info">Editar</a>
+                  <a href="/detalleVenta/delete/<%= detalles[i].id %>" class="btn btn-danger">Eliminar</a>
+                </td>
+              </tr>
+            <% } %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/_footer') %>

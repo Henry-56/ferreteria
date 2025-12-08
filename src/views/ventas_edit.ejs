@@ -1,0 +1,101 @@
+<%- include('partials/_header') %>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <form action="/ventas/update/<%= venta.id %>" method="post">
+            <div class="form-group my-2">
+              <label for="fecha">Fecha:</label>
+              <input type="date" name="fecha" id="fecha"
+                value="<%= venta.fecha ? venta.fecha.toISOString().slice(0,10) : '' %>"
+                class="form-control" required>
+            </div>
+            <div class="form-group my-2">
+              <label for="usuario">Usuario:</label>
+              <input type="text" name="usuario" id="usuario"
+                value="<%= venta.usuario || '' %>" class="form-control" required>
+            </div>
+            <div class="form-group my-2">
+              <label for="total">Total:</label>
+              <input type="number" step="0.01" name="total" id="total"
+                value="<%= venta.total || 0 %>" class="form-control" readonly>
+              <!-- El campo total ahora no se puede editar (readonly) -->
+            </div>
+            <button type="submit" class="btn btn-success mt-3">Editar Venta</button>
+
+            <!-- Detalles como campos dentro del formulario -->
+            <table class="table table-bordered mt-4">
+              <thead>
+                <tr>
+                  <th>Nombre Producto</th>
+                  <th>Descripción</th>
+                  <th>Rubro</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unit.</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% detalles.forEach((det, index) => { %>
+                  <tr>
+                    <td>
+                      <%= det.producto && det.producto.dataValues ? det.producto.dataValues.nombre : '' %>
+                      <input type="hidden" name="detalles[<%= index %>][id]" value="<%= det.id %>">
+                    </td>
+                    <td><%= det.producto && det.producto.dataValues ? det.producto.dataValues.descripcion : '' %></td>
+                    <td>
+                      <%= det.producto && det.producto.rubro && det.producto.rubro.nombre
+                          ? det.producto.rubro.nombre : '' %>
+                    </td>
+                    <td>
+                      <input type="number" min="1" step="1" class="cantidad" data-index="<%= index %>" 
+                        value="<%= det.cantidad %>" name="detalles[<%= index %>][cantidad]" required>
+                      <input type="hidden" name="detalles[<%= index %>][precio_unit]" value="<%= det.precio_unit %>">
+                    </td>
+                    <td><%= det.precio_unit %></td>
+                    <td class="subtotal">
+                      <span><%= det.subtotal %></span>
+                      <input type="hidden" name="detalles[<%= index %>][subtotal]" value="<%= det.subtotal %>">
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.cantidad').forEach(input => {
+    input.addEventListener('input', function() {
+      const index = this.getAttribute('data-index');
+      const cantidad = parseFloat(this.value) || 0;
+      const precioUnit = parseFloat(document.querySelector(`input[name="detalles[${index}][precio_unit]"]`).value);
+
+      // Encuentra la celda subtotal (span + input)
+      const subtotalCell = this.closest('tr').querySelector('.subtotal');
+      const subtotalSpan = subtotalCell.querySelector('span');
+      const subtotalInput = subtotalCell.querySelector('input[type="hidden"]');
+
+      // Calcula y actualiza sumarizado
+      const subtotal = cantidad * precioUnit;
+      subtotalSpan.textContent = subtotal.toFixed(2);
+      subtotalInput.value = subtotal.toFixed(2);
+
+      // Recalcula el total sumando todos los inputs de subtotal
+      let total = 0;
+      document.querySelectorAll('.subtotal input[type="hidden"]').forEach(cell => {
+        total += parseFloat(cell.value) || 0;
+      });
+
+      document.getElementById('total').value = total.toFixed(2);
+    });
+  });
+</script>
+
+<%- include('partials/_footer') %>

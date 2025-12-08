@@ -1,0 +1,116 @@
+<%- include('partials/_header') %>
+
+<div class="container">
+  <div class="row mt-5">
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-body">
+          <form action="/productos/add" method="post">
+            <div class="form-group my-2">
+              <input type="text" name="nombre" placeholder="Nombre" class="form-control" required>
+            </div>
+            <div class="form-group my-2">
+              <label for="id_rubro">Categoría / Rubro:</label>
+              <select name="id_rubro" class="form-control" required>
+                <% if(rubros && rubros.length > 0){ %>
+                  <% for(let rubro of rubros){ %>
+                    <option value="<%= rubro.id %>"><%= rubro.nombre %></option>
+                  <% } %>
+                <% } else { %>
+                  <option>Sin categorías</option>
+                <% } %>
+              </select>
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="descripcion" placeholder="Descripción" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <input type="number" step="0.01" name="precio_compra" placeholder="Precio Compra" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <input type="number" step="0.01" name="precio_venta" placeholder="Precio Venta" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="marca" placeholder="Marca" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="talla" placeholder="Talla" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="color" placeholder="Color" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <label for="unidad">Unidad de Medida:</label>
+              <select name="unidad" class="form-control">
+                <option value="pieza">Pieza</option>
+                <option value="metro">Metro</option>
+                <option value="kilo">Kilo</option>
+                <option value="litro">Litro</option>
+                <option value="unidad">Unidad</option>
+                <!-- Puedes agregar más según tu catálogo -->
+              </select>
+            </div>
+            <div class="form-group my-2">
+              <input type="number" name="stock" placeholder="Stock inicial" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <input type="text" name="codigo_barra" placeholder="Código de barra" class="form-control">
+            </div>
+            <div class="form-group my-2">
+              <label for="proveedor_id">Proveedor:</label>
+              <select name="proveedor_id" class="form-control">
+                <% if(proveedores && proveedores.length > 0){ %>
+                  <% for(let proveedor of proveedores){ %>
+                    <option value="<%= proveedor.id %>"><%= proveedor.nombre %></option>
+                  <% } %>
+                <% } else { %>
+                  <option>Sin proveedores</option>
+                <% } %>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-success mt-3">
+              Guardar producto
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>N</th>
+            <th>Nombre</th>
+            <th>Rubro</th>
+            <th>Precio Compra</th>
+            <th>Precio Venta</th>
+            <th>Stock</th>
+            <th>Unidad</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if(productos){ %>
+            <% for (let i=0; i < productos.length; i++){ %>
+              <tr>
+                <td><%= (i+1) %></td>
+                <td><%= productos[i].nombre %></td>
+                <td><%= productos[i].rubro.nombre || productos[i].id_rubro %></td>
+                <td>S/<%= productos[i].precio_compra %></td>
+                <td>S/<%= productos[i].precio_venta %></td>
+                <td><%= productos[i].stock %></td>
+                <td><%= productos[i].unidad %></td>
+                <td>
+                  <a href="productos/delete/<%= productos[i].id %>" class="btn btn-danger">Eliminar</a>
+                  <a href="productos/edit/<%= productos[i].id %>" class="btn btn-info">Editar</a>
+                </td>
+              </tr>
+            <% } %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/_footer') %>

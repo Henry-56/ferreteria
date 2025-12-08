@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta - POS</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/pos.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>📊 POS</h2>
+            </div>
+
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-role" id="userRole">-</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/views/dashboard.html" class="nav-link">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/views/pos.html" class="nav-link active">
+                    <span>🛒</span>
+                    <span>Punto de Venta</span>
+                </a>
+                <a href="/views/productos.html" class="nav-link">
+                    <span>📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="/views/inventario.html" class="nav-link">
+                    <span>📋</span>
+                    <span>Inventario</span>
+                </a>
+                <a href="/views/reportes.html" class="nav-link">
+                    <span>📈</span>
+                    <span>Reportes</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary" style="width: 100%;" id="logoutBtn">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>🛒 Punto de Venta</h1>
+                <p>Realiza ventas de forma rápida y sencilla</p>
+            </div>
+
+            <div class="pos-container">
+                <!-- Panel de productos -->
+                <div class="products-panel">
+                    <div class="search-section">
+                        <input type="text" id="searchInput" class="search-input"
+                            placeholder="🔍 Buscar producto por nombre o código de barras..." autofocus>
+                    </div>
+
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Se llena con JS -->
+                    </div>
+                </div>
+
+                <!-- Panel de carrito -->
+                <div class="cart-panel">
+                    <div class="cart-header">
+                        <h3>Carrito de Compras</h3>
+                    </div>
+
+                    <div class="cart-items" id="cartItems">
+                        <div class="cart-empty">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">🛒</div>
+                            <p>El carrito está vacío</p>
+                            <p style="font-size: 0.875rem;">Agrega productos para comenzar</p>
+                        </div>
+                    </div>
+
+                    <div class="cart-totals">
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">S/ 0.00</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Descuento:</span>
+                            <span id="descuento">S/ 0.00</span>
+                        </div>
+                        <div class="total-row final">
+                            <span>TOTAL:</span>
+                            <span id="total">S/ 0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="cart-actions">
+                        <button class="btn btn-success btn-lg" id="finalizarVentaBtn" disabled>
+                            💰 Finalizar Venta
+                        </button>
+                        <button class="btn btn-secondary" id="limpiarCarritoBtn" disabled>
+                            🗑️ Limpiar Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Pago -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-content">
+            <h3>Finalizar Venta</h3>
+
+            <div class="form-group">
+                <label class="form-label">Método de Pago</label>
+                <div class="payment-methods">
+                    <div class="payment-method selected" data-method="efectivo">
+                        <div class="payment-icon">💵</div>
+                        <div>Efectivo</div>
+                    </div>
+                    <div class="payment-method" data-method="tarjeta">
+                        <div class="payment-icon">💳</div>
+                        <div>Tarjeta</div>
+                    </div>
+                    <div class="payment-method" data-method="transferencia">
+                        <div class="payment-icon">🏦</div>
+                        <div>Transferencia</div>
+                    </div>
+                    <div class="payment-method" data-method="mixto">
+                        <div class="payment-icon">🔀</div>
+                        <div>Mixto</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="montoRecibido" class="form-label">Monto Recibido</label>
+                <input type="number" id="montoRecibido" class="form-input" step="0.01" placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Cambio</label>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-600);" id="cambio">
+                    S/ 0.00
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelarPagoBtn">Cancelar</button>
+                <button class="btn btn-success" id="confirmarPagoBtn">Confirmar Venta</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/pos.js"></script>
+</body>
+
+</html>

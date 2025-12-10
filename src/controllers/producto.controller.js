@@ -313,6 +313,39 @@ class ProductoController {
             next(error);
         }
     }
+
+    /**
+     * POST /api/productos/identificar
+     * Identificar producto usando IA
+     */
+    async identificar(req, res, next) {
+        try {
+            const { imageBase64 } = req.body;
+
+            // 1. Identificar con Gemini
+            const aiService = require('../services/ai.service');
+            const aiResult = await aiService.identifyProduct(imageBase64);
+
+            if (aiResult.error) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'No se pudo identificar un producto claro en la imagen'
+                });
+            }
+
+            return res.json({
+                success: true,
+                data: {
+                    identification: aiResult,
+                    // Devolvemos searchQuery para que el frontend lo use si quiere
+                    searchQuery: aiResult.searchQuery
+                }
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new ProductoController();

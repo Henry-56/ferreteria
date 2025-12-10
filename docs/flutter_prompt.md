@@ -33,7 +33,8 @@ El backend ya existe y expone una API RESTful.
 - **Pass:** `admin123`
 - `POST /auth/login`
 - Body: `{ "username": "admin", "password": "admin123" }`
-- Response: `{ "success": true, "token": "JWT...", "user": { ... } }`
+- Response (Correcto): `{ "success": true, "data": { "token": "JWT...", "user": { ... } } }`
+**NOTA:** El token viene dentro de `data.token`.
 
 **B. Escaneo (Búsqueda Exacta):**
 - `GET /productos/barcode/{codigo}`

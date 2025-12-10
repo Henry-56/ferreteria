@@ -31,6 +31,14 @@ router.get('/barcode/:codigo',
     productoController.buscarPorCodigoBarras
 );
 
+// POST /api/productos/identificar - Identificar producto por IA
+router.post('/identificar',
+    authorize(PERMISSIONS.PRODUCTOS_VER),
+    body('imageBase64').notEmpty().withMessage('La imagen es requerida'),
+    handleValidationErrors,
+    productoController.identificar
+);
+
 // GET /api/productos/:id - Obtener producto
 router.get('/:id',
     authorize(PERMISSIONS.PRODUCTOS_VER),

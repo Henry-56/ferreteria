@@ -8,14 +8,33 @@ const crypto = require('crypto');
 class StorageService {
     constructor() {
         try {
-            // Cargar credenciales manualmente para evitar problemas con la librería en ciertos entornos
-            const keyPath = process.env.GCS_KEYFILE_PATH;
             let credentials = null;
             let projectId = process.env.GCS_PROJECT_ID;
 
-            if (keyPath) {
+            // === OPCIÓN 1: Credenciales Base64 (PRODUCCIÓN - Railway/Vercel) ===
+            if (process.env.GCS_CREDENTIALS_BASE64) {
                 try {
-                    const fullPath = path.resolve(keyPath);
+                    const decodedCredentials = Buffer.from(
+                        process.env.GCS_CREDENTIALS_BASE64,
+                        'base64'
+                    ).toString('utf8');
+                    const keyData = JSON.parse(decodedCredentials);
+
+                    credentials = {
+                        client_email: keyData.client_email,
+                        private_key: keyData.private_key ? keyData.private_key.replace(/\\n/g, '\n') : undefined
+                    };
+                    projectId = keyData.project_id || projectId;
+                    logger.info('✅ Credenciales GCS cargadas desde Base64');
+                } catch (err) {
+                    logger.error(`Error decodificando GCS_CREDENTIALS_BASE64: ${err.message}`);
+                }
+            }
+
+            // === OPCIÓN 2: Archivo JSON (DESARROLLO LOCAL) ===
+            else if (process.env.GCS_KEYFILE_PATH) {
+                try {
+                    const fullPath = path.resolve(process.env.GCS_KEYFILE_PATH);
                     const keyFileContent = fs.readFileSync(fullPath, 'utf8');
                     const keyData = JSON.parse(keyFileContent);
                     credentials = {
@@ -23,16 +42,19 @@ class StorageService {
                         private_key: keyData.private_key ? keyData.private_key.replace(/\\n/g, '\n') : undefined
                     };
                     projectId = keyData.project_id || projectId;
+                    logger.info('✅ Credenciales GCS cargadas desde archivo JSON');
                 } catch (err) {
                     logger.error(`Error leyendo archivo de credenciales GCS: ${err.message}`);
                 }
             }
 
-            if (!credentials) {
+            // === OPCIÓN 3: Variables individuales (FALLBACK) ===
+            else {
                 credentials = {
                     client_email: process.env.GCS_CLIENT_EMAIL,
                     private_key: process.env.GCS_PRIVATE_KEY?.replace(/\\n/g, '\n')
                 };
+                logger.info('⚠️ Credenciales GCS desde variables individuales');
             }
 
             this.storage = new Storage({

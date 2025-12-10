@@ -19,6 +19,28 @@ const { syncModels } = require('./models');
 const app = express();
 
 // ====================
+// CORS Manual + Private Network Access (PNA) Fix - PRIMERO EN LA LISTA
+// ====================
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+
+    if (origin) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+
+    res.setHeader('Access-Control-Allow-Private-Network', 'true');
+
+    if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Access-Control-Allow-Private-Network');
+        return res.sendStatus(204);
+    }
+
+    next();
+});
+
+// ====================
 // Seguridad
 // ====================
 app.use(helmet({
@@ -30,11 +52,31 @@ app.use(helmet({
     },
 }));
 
-// CORS
-app.use(cors({
-    origin: process.env.CORS_ORIGIN || '*',
-    credentials: true
-}));
+// CORS Manual + Private Network Access (PNA) Fix
+// Chrome bloquea peticiones de HTTPS a Localhost a menos que el preflight (OPTIONS)
+// responda explícitamente con Access-Control-Allow-Private-Network: true
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+
+    // Permitir el origen que hace la petición (equivalente a origin: true)
+    if (origin) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+
+    // Header MÁGICO para PNA
+    res.setHeader('Access-Control-Allow-Private-Network', 'true');
+
+    // Manejar el Preflight (OPTIONS) manualmente
+    if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Access-Control-Allow-Private-Network');
+        // Responder OK y terminar la petición aquí
+        return res.sendStatus(204);
+    }
+
+    next();
+});
 
 // Rate Limiting - protección contra ataques de fuerza bruta
 const apiLimiter = rateLimit({
